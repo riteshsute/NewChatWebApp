@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat App</title>
+  <link rel="stylesheet" href="../styleChat.css">
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-box">
+      <div class="chat-header">
+        <h3>Chat App</h3>
+        <div class="user-count"> Online </div>
+        <ul id="user-list"> </ul> <!-- Empty list -->
+      </div>
+      <div id="group-list" class="group-list">
+        <h4>Groups</h4>
+        <div id="current-group" class="current-group">Current Group: </div>
+        <ul id="group-list-items"></ul>
+        <input id="group-name" type="text" class="group-name" placeholder="Enter group name...">
+        <input id="invited-users" type="text" class="invited-users" placeholder="Enter invited users (comma-separated)...">
+        <button id="create-group-btn" class="create-group-btn">Create Group</button>
+      </div>
+      <div id="chat-window" class="chat-messages"> </div> <!-- Chat window to display messages -->
+      
+      <form id="chat-form" class="chat-form">
+        <input id="chatIn" type="text" class="chat-input" placeholder="Enter your message...">
+        <button type="submit" class="chat-submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script> 
+
+  <script src="./message.js"></script>
+</body>
+</html>
