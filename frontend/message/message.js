@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
       try {
         const payload = token.split('.')[1];
         const decodedPayload = atob(payload);
-        const { name, userId } = JSON.parse(decodedPayload);
+        const { name, userId, adminId } = JSON.parse(decodedPayload);
         console.log(userId, 'areeeeeeeeeeeeeeee')
         return { name, userId };
       } catch (error) {
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   
     function updateUsers(userList) {
-      const userListElement = document.getElementById("user-list");
+      const userListElement = document.getElementById("online-list");
       userListElement.innerHTML = ""; 
   
       
@@ -50,14 +50,14 @@ document.addEventListener("DOMContentLoaded", function() {
       const userId = userInfo.userId; 
       const message = messageInput.value;    
 
-      console.log(userId, ' userrId from useerInfo');
+      console.log(userId, groupId, ' userrId from useerInfo');
       
       if (message.trim() !== "") {
         let url;
-        if (groupId) {
-          url = `http://localhost:4000/ChatApp/sendGroupMessage`;
-        } else {
+        if (!groupId) {
           url = `http://localhost:4000/ChatApp/sendMessage`;
+        } else {
+          url = `http://localhost:4000/ChatApp/sendGroupMessage`;
         }
     
         const messageObject = {
@@ -163,10 +163,14 @@ document.addEventListener("DOMContentLoaded", function() {
       const invitedUsers = invitedUsersInput.value;
   
       const userIds = invitedUsers.split(",").map(id => id.trim());
+
+      const userInfo = getUserInfoFromToken();
+      const userId = userInfo.userId;
   
       const data = {
         name: groupName,
         userIds: userIds,
+        adminId: userId
       };
   
       axios
@@ -258,8 +262,124 @@ document.addEventListener("DOMContentLoaded", function() {
           console.error("Error fetching group messages", error);
         });
     }
+
+
+    // groupId = " ";
+
+
+  function searchUser(query, groupId) {
+    console.log(query, groupId,  'at frontend code')
+    axios
+      .get("http://localhost:4000/ChatApp/searchUser", {
+          params: {
+            query: query,
+            groupId: groupId
+          },
+        })
+        .then((response) => {
+          const userList = response.data.users;
+          console.log(response.data, ' in the frontend search')
+          const userListElement = document.getElementById("user-list");
+          const searchResultsElement = document.getElementById("search-results");
+          userListElement.innerHTML = "";
+          searchResultsElement.innerHTML = "";
+
+          const adminId = response.data.adminId;
+          // console.log(token2, ' pouiiiiii')
+          // const decodedToken2 = atob(token2);
+          // console.log(decodedToken2, ' kooiiiiiiiii')
+
+          // const { adminId } = JSON.parse(decodedToken2);
     
+          console.log(adminId, 'jjjjjjjoooooo');
+
+ 
+          userList.forEach((user) => {
+            const listItem = document.createElement("li");
+            listItem.innerText = user.name;
+
+            listItem.addEventListener("click", function() {
+              addUserToGroup(user, groupId, adminId);
+            });
+
+  
+            userListElement.appendChild(listItem);
+          });
+  
+          searchResultsElement.innerHTML = `Search Results for '${query}': ${userList.length} users found.`;
+        })
+        .catch((error) => {
+          console.error("Error searching user:", error);
+        });
+    }
+
+
+    const searchUserInput = document.getElementById("search-user");
+  
+    searchUserInput.addEventListener("input", function () {
+      const query = searchUserInput.value.trim();
+      if (query !== "") {
+        searchUser(query, groupId);
+      } else {
+        displayUsers(); // Show all users when the search query is empty
+      }
+    });
+
+
+
+  function addUserToGroup(user, groupId, adminId) {
     
+    const userInfo = getUserInfoFromToken();
+    const currentUserId = userInfo.userId;
+
+    console.log(currentUserId, ' klloloooooo')
+    if (adminId !== currentUserId) {
+      console.log("Only the group admin can add users.");
+      alert("Only the group admin can add users.");
+      return;
+    }
+
+      console.log(user, groupId, adminId, 'in the addusergroup fun')
+  
+      const invitedUsersInput = document.getElementById("invited-users");
+      const invitedUsers = invitedUsersInput.value;
+      const userIds = invitedUsers ? invitedUsers.split(",").map((id) => id.trim()) : [];
+  
+      userIds.push(user.id);
+  
+      invitedUsersInput.value = userIds.join(", ");
+  
+      const userId = user.id;
+  
+      axios
+        .post(`http://localhost:4000/ChatApp/addGroupMember/${groupId}/${userId}`, {
+          currentUserId: currentUserId 
+        })
+        .then((response) => {
+          console.log("User added to group successfully");
+          console.log(response, ' resonse adding 1111')
+        })
+        .catch((error) => {
+          console.error("Error adding user to group:", error);
+        });
+    }
+
+
+    const addUserBtn = document.getElementById("add-user-btn");
+    addUserBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      const query = searchUserInput.value.trim();
+      if (query !== "") {
+        searchUser(query);
+      }
+    });
+
+  
+     const chatForm = document.getElementById("chat-form");
+      chatForm.addEventListener("submit", function(event) {
+        event.preventDefault(); 
+        sendChatMessage(groupId); 
+      });
     
   
     // function startMessageUpdate() {
@@ -274,11 +394,7 @@ document.addEventListener("DOMContentLoaded", function() {
     displayGroups();
     // startMessageUpdate()
   
-    const chatForm = document.getElementById("chat-form");
-    chatForm.addEventListener("submit", function(event) {
-      event.preventDefault(); 
-      sendChatMessage(groupId); 
-    });
+    
   
     const createGroupBtn = document.getElementById("create-group-btn");
     createGroupBtn.addEventListener("click", function(event) {

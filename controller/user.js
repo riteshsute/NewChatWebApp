@@ -11,8 +11,8 @@ const signUpUser = ( async (req, res) => {
       console.log("in the backend singup 1")
       if (existingUser) {
         return res.status(400).json({
-          error: 'User already exists',
-          message: 'User already exists'
+          error: 'user already exists in database',
+          message: 'user already exists '
         });
       } 
         Bcrypt.hash(password, 10, async(err, hash) => {
@@ -20,7 +20,7 @@ const signUpUser = ( async (req, res) => {
           const user = await User.create({name, email, password: hash, phonenumber});
         
           res.status(201).json({
-          message: 'User created successfully'
+          message: 'user created successfully'
         }) 
       });
     } catch(err) {
@@ -48,7 +48,7 @@ const signUpUser = ( async (req, res) => {
             if(result === true){
               res.status(200).json({ 
                 success: true, 
-                message: "User logged in successfully", 
+                message: "user logged in successfully", 
                 token: generateAccessToken( user[0].id, user[0].name ),
               });
             } else {

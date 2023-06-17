@@ -16,7 +16,7 @@ const signupRoute = require('./route/userRoute');
 const messageRoute = require('./route/messageRoute');
 const groupRoute = require('./route/groupRoute')
 const sequelize = require('./util/database');
-
+ 
 app.use('/ChatApp', signupRoute);
 app.use('/ChatApp', messageRoute);
 app.use('/ChatApp', groupRoute);
@@ -24,13 +24,13 @@ app.use('/ChatApp', groupRoute);
 const Chats = require('./model/messageDb');
 const User = require('./model/userDb');
 const Group = require('./model/group');
-// const UserGroup = require('./model/userGroup');
+const UserGroup = require('./model/userGroup');
 
 User.hasMany(Chats);
 Chats.belongsTo(User);
-
-User.belongsToMany(Group, { through: 'UserGroup' });
-Group.belongsToMany(User, { through: 'UserGroup' });
+  
+// User.belongsToMany(Group, { through: 'UserGroup' });
+// Group.belongsToMany(User, { through: 'UserGroup' });
 
 Chats.belongsTo(User); 
 
@@ -40,14 +40,14 @@ Chats.belongsTo(Group, { foreignKey: 'groupId' });
   
 sequelize
   // .sync({ force: true })
-  .sync()
+  .sync() 
   .then(() => {
     const socketServer = initSocket(server); // Initialize Socket.IO
 
     server.listen(4000, () => {
       console.log('Server is running on port 4000');
     });
-  })
+  }) 
   .catch((err) => {
     console.error('Error starting server:', err);
   });  

@@ -7,14 +7,14 @@ const Group = require('../model/group');
 
 exports.getUsers = (req, res) => {
   User.findAll({
-    attributes: ['id', 'name', 'isLoggedIn'] // Include the 'id' and 'isLoggedIn' attributes
+    attributes: ['id', 'name', 'isLoggedIn'] // including the 'id' and 'isLoggedIn' attributes
   })
     .then(users => {
       res.json(users);
     })
     .catch(error => {
-      console.error("Error fetching users:", error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error("error getting users:", error);
+      res.status(500).json({ error: 'server error in getUsers' });
     });
 }; 
 
@@ -32,11 +32,11 @@ exports.sendMessage = async (req, res) => {
       // console.log(newMessage, ' in the newmessage')
 
       await Message.create({ userId, message });
-      res.status(200).json({ success: true, message: 'Chat message stored successfully' });
+      res.status(200).json({ success: true, message: ' message stored in database' });
        } 
     }catch (error) {
-      console.error('Error storing chat message:', error);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+      console.error('erro storing message:', error);
+      res.status(500).json({ success: false, error: 'backend server error' });
     }
   };
    
@@ -47,7 +47,7 @@ exports.sendMessage = async (req, res) => {
       console.log(groupId, userId, 'jbdkjbdkdgkdgkgdd')
       const sender = await User.findByPk(userId);
       if (!sender) {
-        return res.status(400).json({ success: false, error: 'User not found' });
+        return res.status(400).json({ success: false, error: 'user not found' });
       }
   
       // const group = await Group.findByPk(groupId);
@@ -57,10 +57,10 @@ exports.sendMessage = async (req, res) => {
   
       const newMessage = await Message.create({ userId, groupId, message });
   
-      res.status(200).json({ success: true, newMessage, message: 'Group chat message stored successfully' });
+      res.status(200).json({ success: true, newMessage, message: 'Group message stored in database' });
     } catch (error) {
-      console.error('Error storing group chat message:', error);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+      console.error('error storing group message:', error);
+      res.status(500).json({ success: false, error: ' server error in group msg storing' });
     }
   };
 
@@ -107,7 +107,9 @@ exports.sendMessage = async (req, res) => {
           groupId: groupId,
           id: { [Op.gt]: lastMessageId },
         },
-        include: [{ model: User, attributes: ['id', 'name'] }],
+        include: [{ model: User, 
+          attributes: ['id', 'name'] 
+        }],
       });
 
       // console.log(messages, ' in the messages backend ')
