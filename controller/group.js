@@ -184,15 +184,25 @@ exports.makeMemberAdmin = async (req, res) => {
 
     const group = await Group.findByPk(groupId);
     const user = await User.findByPk(memberId);
-    const admin = await userGroup.findByPk(groupId);
+
+    const admin = await userGroup.findAll({
+      where: { groupId: groupId }
+    });
+
+    const adminIds = admin.map(admin => admin.adminId);
 
     if (!group) {
+      console.log('group error found')
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    if (!admin) {
+    console.log(admin, 'check here')
+
+    if (!adminIds.includes(currentUserId)) {
+      console.log('admin error found')
       return res.status(403).json({ error: 'Only the group admin can make members admin' });
     }
+   
 
     const member = await userGroup.findOne({
       where: {
@@ -201,6 +211,7 @@ exports.makeMemberAdmin = async (req, res) => {
       },
     });
 
+    console.log(member, 'group error found')
     if (!member) {
       return res.status(404).json({ error: 'Member not found in the group' });
     }
