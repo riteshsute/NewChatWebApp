@@ -229,6 +229,8 @@ document.addEventListener("DOMContentLoaded", function() {
       const userInfo = getUserInfoFromToken();
       const userId = userInfo.userId;
   
+      getGroupMembers(groupId);
+      
       axios
         .get(`http://localhost:4000/ChatApp/getMessage/${groupId}`, {
           params: {
@@ -284,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function() {
           userListElement.innerHTML = "";
           searchResultsElement.innerHTML = "";
 
-          const adminId = response.data.adminId;
+          const adminId = response.data.adminIds;
           // console.log(token2, ' pouiiiiii')
           // const decodedToken2 = atob(token2);
           // console.log(decodedToken2, ' kooiiiiiiiii')
@@ -333,9 +335,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentUserId = userInfo.userId;
 
     console.log(currentUserId, ' klloloooooo')
-    if (adminId !== currentUserId) {
-      console.log("Only the group admin can add users.");
-      alert("Only the group admin can add users.");
+    if (!adminId.includes(currentUserId)) {
+      console.log("Only group admin can add users.");
+      alert("Only group admin can add users.");
       return;
     }
 
@@ -360,7 +362,7 @@ document.addEventListener("DOMContentLoaded", function() {
           console.log(response, ' resonse adding 1111')
         })
         .catch((error) => {
-          console.error("Error adding user to group:", error);
+          console.error("error adding user to group:", error);
         });
     }
 
@@ -381,7 +383,79 @@ document.addEventListener("DOMContentLoaded", function() {
         sendChatMessage(groupId); 
       });
     
-  
+
+    function makeMemberAdmin(groupId, memberId) {
+      const userInfo = getUserInfoFromToken();
+      const currentUserId = userInfo.userId;
+
+      console.log(groupId, memberId, currentUserId, ' {{{{{{{{{}}}}}')
+      axios
+        .put(`http://localhost:4000/ChatApp/makeAdmin/${groupId}/${memberId}`, {
+          currentUserId: currentUserId
+        })
+        .then(response => {
+          console.log("user successfully made admin");
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error("erro making user admin:", error);
+        });
+    }
+
+
+    document.addEventListener("click", function(event) {
+      if (event.target.classList.contains("make-admin-btn")) {
+        // const groupId = event.target.getAttribute("data-group-id");
+        const memberIdInput = document.getElementById("make-admin-input");
+        const memberId = memberIdInput.value;
+        makeMemberAdmin(groupId, memberId);
+      }
+    });
+
+    function getGroupMembers(groupId) {
+
+      console.log(groupId, ' in frontend member')
+      axios.get(`http://localhost:4000/ChatApp/groupMembers/${groupId}`)
+        .then(response => {
+          const groupMembers = response.data;
+          // Use the groupMembers data as neededa
+          console.log(groupMembers, ' kohaoahoaoaoa');
+          const memberList = document.getElementById("member-list");
+          memberList.innerHTML = ""; // Clear the existing member list
+    
+          groupMembers.forEach(member => {
+            const memberItem = document.createElement("li");
+            memberItem.textContent = member.name;
+
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "Remove";
+            removeButton.addEventListener("click", () => removeMember(member.id)); // Assuming each member has an "id" property
+          
+            memberItem.appendChild(removeButton);
+            memberList.appendChild(memberItem);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching group members:", error);
+        });
+    }
+
+
+    function removeMember(memberId) {
+      // Send a request to remove the member from the group
+      axios.delete(`http://localhost:4000/ChatApp/removeMember/${memberId}`)
+        .then(response => {
+          // Handle the successful removal of the member
+          console.log(response, "Member removed successfully");
+          // You may want to update the member list by calling the getGroupMembers function again
+          getGroupMembers(groupId);
+        })
+        .catch(error => {
+          console.error("Error removing member:", error);
+        });
+    }
+    
+
     // function startMessageUpdate() {
     //   setInterval(() => {
     //     updateChatWindow();

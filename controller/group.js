@@ -4,7 +4,8 @@ const User = require('../model/userDb');
 const userMessage = require('../model/messageDb');
 const jwt = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
-const userGroup = require('../model/userGroup')
+const userGroup = require('../model/userGroup');
+const { use } = require('../route/userRoute');
 
 
 exports.createGroup = async (req, res) => {
@@ -39,7 +40,7 @@ exports.createGroup = async (req, res) => {
 exports.displayGroups = async (req, res) => {
   try {
     const groups = await Group.findAll();
-    res.json(groups);
+    res.status(200).json(groups);
   } catch (error) {
     console.error("Error getting group list:", error);
     res.status(500).json({ error: 'backend error in display group' });
@@ -60,7 +61,7 @@ exports.addUserToGroup = async (req, res) => {
 
     await group.addUser(user);
 
-    res.json({ success: true, message: 'user  added to group' });
+    res.status(200).json({ success: true, message: 'user  added to group' });
   } catch (error) {
     console.error('Error adding user to group:', error);
     res.status(500).json({ success: false, error: 'backend adding user to group error' });
@@ -71,16 +72,25 @@ exports.addUserToGroup = async (req, res) => {
 exports.getGroupMembers = async (req, res) => {
   const { groupId } = req.params;
 
+  console.log(groupId, ' koHOPOOOOO')
   try {
     const group = await Group.findByPk(groupId, {
-      include: [User],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name']
+        }
+      ]
     });
 
     if (!group) {
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    res.json(group.Users);
+    const groupMembers = group.users;
+
+    console.log(groupMembers, ' xoxoxoxoxoxo')
+    res.status(200).json(groupMembers);
   } catch (error) {
     console.error('Error fetching group members:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
@@ -102,13 +112,17 @@ exports.searchUser = async (req, res) => {
 
     // console.log( users, 'at admin in backend ')
 
-    const admin = await userGroup.findByPk(groupId);
+    const admin = await userGroup.findAll({
+      where: { groupId: groupId }
+    });
 
-    const adminId = admin.adminId
+    const adminIds = admin.map(admin => admin.adminId);
+
+    console.log( adminIds, 'at adminId ree in backend ')
     // const token2 = generateAccessToken(admin.adminId);
-    res.json({
+    res.status(200).json({
       users, 
-      adminId
+      adminIds
     });
   } catch (error) {
     console.error('errpr searching user:', error);
@@ -126,7 +140,10 @@ exports.addUserToGroupByAdmin = async (req, res) => {
   try {
     const group = await Group.findByPk(groupId);
     const user = await User.findByPk(userId);
-    const admin = await userGroup.findByPk(groupId);
+
+    const admin = await userGroup.findAll({
+      where: { groupId: groupId }
+    });
 
     console.log(user.id, 'youoyououououo222222222')
 
@@ -134,9 +151,11 @@ exports.addUserToGroupByAdmin = async (req, res) => {
       return res.status(404).json({ error: 'Group or user not found' });
     }
 
-    console.log(admin.adminId, '3333333333333')
-    // Check if the current user is the admin of the group
-    if (admin.adminId !== currentUserId) {
+    const adminIds = admin.map(admin => admin.adminId);
+
+    console.log(adminIds, '3333333333333')
+    
+    if (!adminIds.includes(currentUserId)) {
       return res.status(403).json({ error: 'Only the group admin can add users to the group' });
     }
 
@@ -148,12 +167,82 @@ exports.addUserToGroupByAdmin = async (req, res) => {
       adminId: currentUserId
     });
 
-    res.json({ success: true, message: 'User added to the group', adminId: admin.adminId });
+    res.status(201).json({ success: true, message: 'User added to the group', adminId: admin.adminId });
   } catch (error) {
     console.error('Error adding user to group:', error);
     res.status(500).json({ success: false, error: 'Backend server error in adding user to group' });
   }
 };
+
+
+exports.makeMemberAdmin = async (req, res) => {
+  try {
+    const { groupId, memberId } = req.params;
+    const { currentUserId } = req.body;
+
+    console.log(groupId, memberId, currentUserId, ' [{{{{}}}}}] ');
+
+    const group = await Group.findByPk(groupId);
+    const user = await User.findByPk(memberId);
+    const admin = await userGroup.findByPk(groupId);
+
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    if (!admin) {
+      return res.status(403).json({ error: 'Only the group admin can make members admin' });
+    }
+
+    const member = await userGroup.findOne({
+      where: {
+        groupId: group.id,
+        userId: memberId,
+      },
+    });
+
+    if (!member) {
+      return res.status(404).json({ error: 'Member not found in the group' });
+    }
+
+    member.adminId = memberId;
+
+    await member.save();
+
+    res.status(200).json({ success: true, message: 'Member successfully made admin', adminId: memberId });
+  } catch (error) {
+    console.error('Error making member admin:', error);
+    res.status(500).json({ success: false, error: 'Backend server error in making member admin' });
+  }
+};
+
+
+
+exports.removeMember = async (req, res) => {
+  const { memberId } = req.params;
+
+  console.log(memberId, '<<<<<<<<<<<')
+  try {
+    // Find the userGroup entry for the member
+    const userGroupEntry = await userGroup.findByPk(memberId);
+
+    if (!userGroupEntry) {
+      return res.status(404).json({ error: 'UserGroup entry not found' });
+    }
+
+    // Delete the userGroup entry
+    await userGroupEntry.destroy();
+
+    res.status(200).json({ success: true, message: 'Member removed from the group' });
+  } catch (error) {
+    console.error('Error removing member:', error);
+    res.status(500).json({ success: false, error: 'Backend server error in removing member' });
+  }
+};
+
+
+
+
 
 
 

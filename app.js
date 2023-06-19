@@ -40,7 +40,7 @@ Chats.belongsTo(Group, { foreignKey: 'groupId' });
   
 sequelize
   // .sync({ force: true })
-  .sync() 
+  .sync()  
   .then(() => {
     const socketServer = initSocket(server); // Initialize Socket.IO
 
