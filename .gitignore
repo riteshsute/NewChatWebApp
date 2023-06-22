@@ -12,7 +12,7 @@ dist/
 coverage/
 
 # ignore environment variables and configuration files
-.env
+# .env
 config.js
 
 # ignore dependencies and caches for package managers
