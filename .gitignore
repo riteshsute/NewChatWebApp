@@ -5,7 +5,7 @@ Thumbs.db
 *.swo
 *.bak
 
-# ignore build artifacts and generated files
+# ignore build artifacts and generated files #
 node_modules/
 build/
 dist/
