@@ -35,6 +35,12 @@ app.use('/ChatApp', signupRoute);
 app.use('/ChatApp', messageRoute);
 app.use('/ChatApp', groupRoute);
 
+
+app.use((req, res) => {
+  console.log(req.url, ' url to see')
+  res.sendFile(path.join(__dirname, `public/${req.url}`)); 
+}); 
+
 const Chats = require('./model/messageDb');
 const User = require('./model/userDb');
 const Group = require('./model/group');
