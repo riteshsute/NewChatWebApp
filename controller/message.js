@@ -1,13 +1,12 @@
-// const { userInfo } = require('os');
 const { Op } = require('sequelize');
 const Message = require('../model/messageDb');
 const User = require('../model/userDb');
 const Group = require('../model/group');
-// const userGroup = require('../model/userGroup');
+
 
 exports.getUsers = (req, res) => {
   User.findAll({
-    attributes: ['id', 'name', 'isLoggedIn'] // including the 'id' and 'isLoggedIn' attributes
+    attributes: ['id', 'name', 'isLoggedIn'] 
   })
     .then(users => {
       res.json(users);
@@ -21,15 +20,13 @@ exports.getUsers = (req, res) => {
 exports.sendMessage = async (req, res) => {
     try {
     const { userId, message } = req.body;
-    console.log(userId, 'j22222')
 
     const sender = await User.findByPk(userId)
-    console.log(sender.name, ' 100001 in the newmessage')
+
     if (sender) {
       const newMessage = {
         message, 
       };
-      // console.log(newMessage, ' in the newmessage')
 
       await Message.create({ userId, message });
       res.status(200).json({ success: true, message: ' message stored in database' });
@@ -44,7 +41,6 @@ exports.sendMessage = async (req, res) => {
     try {
       const { userId, groupId, message } = req.body;
 
-      console.log(groupId, userId, 'jbdkjbdkdgkdgkgdd')
       const sender = await User.findByPk(userId);
       if (!sender) {
         return res.status(400).json({ success: false, error: 'user not found' });
@@ -77,11 +73,8 @@ exports.sendMessage = async (req, res) => {
         return res.status(400).json({ success: false, error: 'user not found error' });
       }
   
-      // let messages;
   
       if (groupId) {
-
-        console.log(groupId, userId, 'hnalkanABSahs');
   
         const group = await Group.findByPk(groupId);
         if (!group) {
@@ -90,8 +83,6 @@ exports.sendMessage = async (req, res) => {
 
         const member = await group.hasUser(user);
   
-        console.log(member, 'UUUUUUUUU');
-  
         if (!member) {
           return res.status(401).json({ success: false, error: 'unauthorized' });
         }
@@ -99,8 +90,6 @@ exports.sendMessage = async (req, res) => {
           groupId = null;
         }
 
-      console.log( groupId,  'lsknklsndsad')
-  
       const messages = await Message.findAll({
         attributes: ['id', 'message', 'userId', 'groupId'],
         where: {
@@ -112,7 +101,6 @@ exports.sendMessage = async (req, res) => {
         }],
       });
 
-      // console.log(messages, ' in the messages backend ')
       const formattedMessages = messages.map((message) => ({
         id: message.id,
         message: message.message, 

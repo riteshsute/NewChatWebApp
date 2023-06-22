@@ -13,8 +13,6 @@ exports.createGroup = async (req, res) => {
 
   try {
     const group = await Group.create({ name });
-
-    console.log(adminId, 'JJJJJJJJJJk') 
     
     for (const userId of userIds) {
       await userGroup.create({ groupId: group.id, userId: userId, adminId: adminId });
@@ -72,7 +70,6 @@ exports.addUserToGroup = async (req, res) => {
 exports.getGroupMembers = async (req, res) => {
   const { groupId } = req.params;
 
-  console.log(groupId, ' koHOPOOOOO')
   try {
     const group = await Group.findByPk(groupId, {
       include: [
@@ -89,7 +86,6 @@ exports.getGroupMembers = async (req, res) => {
 
     const groupMembers = group.users;
 
-    console.log(groupMembers, ' xoxoxoxoxoxo')
     res.status(200).json(groupMembers);
   } catch (error) {
     console.error('Error fetching group members:', error);
@@ -104,13 +100,11 @@ exports.getGroupMembers = async (req, res) => {
 exports.searchUser = async (req, res) => {
   const { query, groupId } = req.query;
 
-  console.log(req.query, 'check in backend ')
   try {
     const users = await User.findAll({ 
       where: { name: query }
     })
 
-    // console.log( users, 'at admin in backend ')
 
     const admin = await userGroup.findAll({
       where: { groupId: groupId }
@@ -118,8 +112,7 @@ exports.searchUser = async (req, res) => {
 
     const adminIds = admin.map(admin => admin.adminId);
 
-    console.log( adminIds, 'at adminId ree in backend ')
-    // const token2 = generateAccessToken(admin.adminId);
+    
     res.status(200).json({
       users, 
       adminIds
@@ -135,8 +128,7 @@ exports.searchUser = async (req, res) => {
 exports.addUserToGroupByAdmin = async (req, res) => {
   const { groupId, userId } = req.params;
   const currentUserId  = req.body.currentUserId;
-  // const currentUserId
-  console.log(req.params, currentUserId, req.body,  'youoyououououo')
+
   try {
     const group = await Group.findByPk(groupId);
     const user = await User.findByPk(userId);
@@ -145,7 +137,6 @@ exports.addUserToGroupByAdmin = async (req, res) => {
       where: { groupId: groupId }
     });
 
-    console.log(user.id, 'youoyououououo222222222')
 
     if (!group || !user) {
       return res.status(404).json({ error: 'Group or user not found' });
@@ -153,13 +144,11 @@ exports.addUserToGroupByAdmin = async (req, res) => {
 
     const adminIds = admin.map(admin => admin.adminId);
 
-    console.log(adminIds, '3333333333333')
     
     if (!adminIds.includes(currentUserId)) {
       return res.status(403).json({ error: 'Only the group admin can add users to the group' });
     }
 
-    // await group.addUser(user);
 
     await userGroup.create({
       groupId: group.id,
@@ -180,8 +169,6 @@ exports.makeMemberAdmin = async (req, res) => {
     const { groupId, memberId } = req.params;
     const { currentUserId } = req.body;
 
-    console.log(groupId, memberId, currentUserId, ' [{{{{}}}}}] ');
-
     const group = await Group.findByPk(groupId);
     const user = await User.findByPk(memberId);
 
@@ -192,14 +179,10 @@ exports.makeMemberAdmin = async (req, res) => {
     const adminIds = admin.map(admin => admin.adminId);
 
     if (!group) {
-      console.log('group error found')
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    console.log(admin, 'check here')
-
     if (!adminIds.includes(currentUserId)) {
-      console.log('admin error found')
       return res.status(403).json({ error: 'Only the group admin can make members admin' });
     }
    
@@ -209,9 +192,8 @@ exports.makeMemberAdmin = async (req, res) => {
         groupId: group.id,
         userId: memberId,
       },
-    });
+    }); 
 
-    console.log(member, 'group error found')
     if (!member) {
       return res.status(404).json({ error: 'Member not found in the group' });
     }
@@ -232,16 +214,13 @@ exports.makeMemberAdmin = async (req, res) => {
 exports.removeMember = async (req, res) => {
   const { memberId } = req.params;
 
-  console.log(memberId, '<<<<<<<<<<<')
   try {
-    // Find the userGroup entry for the member
     const userGroupEntry = await userGroup.findByPk(memberId);
 
     if (!userGroupEntry) {
       return res.status(404).json({ error: 'UserGroup entry not found' });
     }
 
-    // Delete the userGroup entry
     await userGroupEntry.destroy();
 
     res.status(200).json({ success: true, message: 'Member removed from the group' });

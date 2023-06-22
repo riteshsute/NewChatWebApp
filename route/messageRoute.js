@@ -9,3 +9,5 @@ router.get('/getUsers', MessageController.getUsers);
 router.get('/getMessage/:groupId?', MessageController.getMessage);
 
 module.exports = router; 
+
+// group

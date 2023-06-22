@@ -14,3 +14,5 @@ User.belongsToMany(Group, { through: { model: UserGroup, unique: false }, foreig
 Group.belongsToMany(User, { through: { model: UserGroup, unique: false }, foreignKey: 'groupId' });
 
 module.exports = UserGroup;
+
+// group

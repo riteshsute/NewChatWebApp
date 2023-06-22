@@ -23,6 +23,7 @@ const UserMessage = sequelize.define('userMessage', {
   // }
 });
 
+// group
 // Group.hasMany(UserMessage, { foreignKey: 'groupId' });
 // UserMessage.belongsTo(Group, { foreignKey: 'groupId' });
 

@@ -33,5 +33,6 @@ const User = sequelize.define('user', {
 });
 
 // User.belongsToMany(Group, { through: 'UserGroup' });
+// group
 
 module.exports = User;
