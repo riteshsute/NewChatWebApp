@@ -10,7 +10,7 @@ function loginUser(event) {
     };
 
 
-    axios.post("http://localhost:4000/ChatApp/login", obj)
+    axios.post("http://13.51.198.21:4000/ChatApp/login", obj)
     .then((response) => {
         localStorage.setItem('token', response.data.token);
         alert(response.data.message);
