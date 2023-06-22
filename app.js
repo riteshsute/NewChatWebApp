@@ -51,6 +51,7 @@ Chats.belongsTo(User);
   
 // User.belongsToMany(Group, { through: 'UserGroup' });
 // Group.belongsToMany(User, { through: 'UserGroup' });
+// to git
 
 Chats.belongsTo(User); 
 
