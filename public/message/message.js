@@ -1,7 +1,7 @@
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    const socket = io('http://localhost:4000');
+    const socket = io('http://13.51.198.21:4000');
   
     socket.on('userStatus', (users) => {
       updateUsers(users);
@@ -50,9 +50,9 @@ document.addEventListener("DOMContentLoaded", function() {
       if (message.trim() !== "") {
         let url;
         if (!groupId) {
-          url = `http://localhost:4000/ChatApp/sendMessage`;
+          url = `http://13.51.198.21:4000/ChatApp/sendMessage`;
         } else {
-          url = `http://localhost:4000/ChatApp/sendGroupMessage`;
+          url = `http://13.51.198.21:4000/ChatApp/sendGroupMessage`;
         }
     
         const messageObject = {
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
   
     function displayUsers() {
-      axios.get("http://localhost:4000/ChatApp/getUsers")
+      axios.get("http://13.51.198.21:4000/ChatApp/getUsers")
         .then(response => {
           const userList = response.data;
           updateUsers(userList);
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userInfo = getUserInfoFromToken();
       const userId = userInfo.userId;
 
-      axios.get('http://localhost:4000/ChatApp/getMessage', { 
+      axios.get('http://13.51.198.21:4000/ChatApp/getMessage', { 
         params: {
           userId: userId,
           lastMessageId: lastMessageId,
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function() {
       };
   
       axios
-        .post("http://localhost:4000/ChatApp/createGroup", data)
+        .post("http://13.51.198.21:4000/ChatApp/createGroup", data)
         .then(response => {
           const { success, groupId } = response.data;
           if (success) {
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
     function displayGroups() {
       axios
-        .get("http://localhost:4000/ChatApp/displayGroups")
+        .get("http://13.51.198.21:4000/ChatApp/displayGroups")
         .then(response => {
           const groupList = response.data;
           const groupListElement = document.getElementById("group-list-items");
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
       getGroupMembers(groupId);
       
       axios
-        .get(`http://localhost:4000/ChatApp/getMessage/${groupId}`, {
+        .get(`http://13.51.198.21:4000/ChatApp/getMessage/${groupId}`, {
           params: {
               userId: userId,
               lastMessageId: lastMessageId,
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function searchUser(query, groupId) {
     axios
-      .get("http://localhost:4000/ChatApp/searchUser", {
+      .get("http://13.51.198.21:4000/ChatApp/searchUser", {
           params: {
             query: query,
             groupId: groupId
@@ -334,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userId = user.id;
   
       axios
-        .post(`http://localhost:4000/ChatApp/addGroupMember/${groupId}/${userId}`, {
+        .post(`http://13.51.198.21:4000/ChatApp/addGroupMember/${groupId}/${userId}`, {
           currentUserId: currentUserId 
         })
         .then((response) => {
@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userInfo = getUserInfoFromToken();
       const currentUserId = userInfo.userId;
       axios
-        .put(`http://localhost:4000/ChatApp/makeAdmin/${groupId}/${memberId}`, {
+        .put(`http://13.51.198.21:4000/ChatApp/makeAdmin/${groupId}/${memberId}`, {
           currentUserId: currentUserId
         })
         .then(response => {
@@ -393,7 +393,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function getGroupMembers(groupId) {
 
-      axios.get(`http://localhost:4000/ChatApp/groupMembers/${groupId}`)
+      axios.get(`http://13.51.198.21:4000/ChatApp/groupMembers/${groupId}`)
         .then(response => {
           const groupMembers = response.data;
           const memberList = document.getElementById("member-list");
@@ -418,7 +418,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     function removeMember(memberId) {
-      axios.delete(`http://localhost:4000/ChatApp/removeMember/${memberId}`)
+      axios.delete(`http://13.51.198.21:4000/ChatApp/removeMember/${memberId}`)
         .then(response => {
           // console.log(response, ' response of remove member')
           getGroupMembers(groupId);
@@ -444,7 +444,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userInfo = getUserInfoFromToken();
       const userId = userInfo.userId;
       
-      axios.get('http://localhost:4000/ChatApp/getMessage', { 
+      axios.get('http://13.51.198.21:4000/ChatApp/getMessage', { 
         params: {
           userId: userId,
           lastMessageId: lastMessageId,
