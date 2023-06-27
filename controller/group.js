@@ -8,7 +8,7 @@ const userGroup = require('../model/userGroup');
 const { use } = require('../route/userRoute');
 
 
-exports.createGroup = async (req, res) => {
+const createGroup = async (req, res) => {
   const { name, userIds, adminId } = req.body;
 
   try {
@@ -35,18 +35,18 @@ exports.createGroup = async (req, res) => {
 };
 
 
-exports.displayGroups = async (req, res) => {
+const displayGroups = async (req, res) => {
   try {
     const groups = await Group.findAll();
     res.status(200).json(groups);
   } catch (error) {
-    console.error("Error getting group list:", error);
+    console.error("Error getting group list", error);
     res.status(500).json({ error: 'backend error in display group' });
   }
 };
 
 
-exports.addUserToGroup = async (req, res) => {
+const addUserToGroup = async (req, res) => {
   const { groupId, userId } = req.params;
 
   try {
@@ -67,21 +67,19 @@ exports.addUserToGroup = async (req, res) => {
 };
 
 
-exports.getGroupMembers = async (req, res) => {
+const getGroupMembers = async (req, res) => {
   const { groupId } = req.params;
 
   try {
     const group = await Group.findByPk(groupId, {
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'name']
-        }
-      ]
+      include: [{
+        model: User,
+        attributes: ['id', 'name'] 
+      }]
     });
 
     if (!group) {
-      return res.status(404).json({ error: 'Group not found' });
+      return res.status(404).json({ error: 'Group not found'});
     }
 
     const groupMembers = group.users;
@@ -97,7 +95,7 @@ exports.getGroupMembers = async (req, res) => {
 
 
 
-exports.searchUser = async (req, res) => {
+const searchUser = async (req, res) => {
   const { query, groupId } = req.query;
 
   try {
@@ -125,7 +123,7 @@ exports.searchUser = async (req, res) => {
 
 
 
-exports.addUserToGroupByAdmin = async (req, res) => {
+const addUserToGroupByAdmin = async (req, res) => {
   const { groupId, userId } = req.params;
   const currentUserId  = req.body.currentUserId;
 
@@ -164,7 +162,7 @@ exports.addUserToGroupByAdmin = async (req, res) => {
 };
 
 
-exports.makeMemberAdmin = async (req, res) => {
+const makeMemberAdmin = async (req, res) => {
   try {
     const { groupId, memberId } = req.params;
     const { currentUserId } = req.body;
@@ -211,7 +209,7 @@ exports.makeMemberAdmin = async (req, res) => {
 
 
 
-exports.removeMember = async (req, res) => {
+const removeMember = async (req, res) => {
   const { memberId } = req.params;
 
   try {
@@ -232,7 +230,16 @@ exports.removeMember = async (req, res) => {
 
 
 
-
+module.exports = {
+  createGroup,
+  displayGroups,
+  addUserToGroup,
+  getGroupMembers,
+  searchUser,
+  addUserToGroupByAdmin,
+  makeMemberAdmin,
+  removeMember
+}
 
 
 

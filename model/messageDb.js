@@ -11,11 +11,15 @@ const UserMessage = sequelize.define('userMessage', {
   },
   message: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: true
+  },
+  fileUrl: {
+    type: Sequelize.STRING,
+    allowNull: true, 
   },
   // groupId: {
   //   type: Sequelize.INTEGER,
-  //   allowNull: false,
+  //   allowNull: false, 
   //   references: {
   //     model: Group,
   //     key: 'id'

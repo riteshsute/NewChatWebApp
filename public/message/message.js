@@ -1,12 +1,36 @@
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    const socket = io('http://13.51.198.21:4000');
+    const socket = io('http://16.171.121.124:4000');
+
+
+    // socket.on('connect', (users) => {
+    //   const userInfo = getUserInfoFromToken()
+    //   const userId = userInfo.userId; 
+    //   // console.log(userId, 'user connect front')
+    //   socket.emit('userConnect', userId);
+    //   console.log(users, 'in the connect event')
+    //   updateUsers(users);
+    // });
+
+
+    // socket.on('userDisconnect', () => {
+    //   // console.log ('user disconnect front');
+    //   const userInfo = getUserInfoFromToken()
+    //   const userId = userInfo.userId; 
+    //   removeUser(userId);
+    //   // console.log( userId, 'user disconnect front 44');
+    //   socket.emit('userDisconnect', userId);
+    //   updateUsers(users)
+    // });
+    
+    // socket.on('newMessage', (message) => {
+    //   // console.log('Received new message:', message);
+    //   displayMessages(message);
+    // });
   
-    socket.on('userStatus', (users) => {
-      updateUsers(users);
-    });
-  
+
+
     function getUserInfoFromToken() {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -23,49 +47,105 @@ document.addEventListener("DOMContentLoaded", function() {
         return null;
       }
     }
+
+
+    const fileInput = document.getElementById("file-input");
+    const fileButton = document.getElementById("file-button");
+
+    fileButton.addEventListener("click", function(event) {
+      event.preventDefault();
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      // console.log(file, 'in fronte file')
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const fileUrl = e.target.result;
+          // console.log(fileUrl, 'in fronte file2')
+          // const message = ''; // You can add an optional message for the file
+          const userInfo = getUserInfoFromToken();
+          const userId = userInfo.userId;
+          // const groupId = ''; // Set the group ID if applicable
+          sendChatMessage( groupId, fileUrl);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+
   
+    
     function updateUsers(userList) {
-      const userListElement = document.getElementById("online-list");
-      userListElement.innerHTML = ""; 
-  
-      
-      userList.forEach(user => {
-        const listItem = document.createElement("li");
+      // console.log(userList, 'jbdkjhkdhbkh1111')
+      const userListElement = document.getElementById('online-list');
+      userListElement.innerHTML = '';
+
+      userList.forEach((user) => {
+        const listItem = document.createElement('li');
         listItem.innerText = user.name;
         userListElement.appendChild(listItem);
       });
-  
-      const userCountElement = document.querySelector(".user-count");
+
+      const userCountElement = document.querySelector('.user-count');
       userCountElement.innerText = `Users (${userList.length})`; // Update user count
     }
+
+
+
+    // function removeUser(userId) {
+    //   // console.log(userId, users, 'in remove fin')
+    //   const userListElement = document.getElementById('online-list');
+    //   const userItem = userListElement.querySelector(`[data-userid="${userId}"]`);
+    //   if (userItem) {
+    //     userItem.remove();
+    //   }
+
+    //   const userCountElement = document.querySelector('.user-count');
+    //   const userList = userListElement.getElementsByTagName('li');
+    //   userCountElement.innerText = `Users (${userList.length})`; // Update user count
+    // }
+
+
+    
   
   
   
-    function sendChatMessage(groupId) {
+    function sendChatMessage(groupId, fileUrl) {
       const messageInput = document.getElementById("chatIn");
       const userInfo = getUserInfoFromToken()
       const userId = userInfo.userId; 
       const message = messageInput.value;    
+
+      // console.log(groupId, 'in front send')
       
-      if (message.trim() !== "") {
+      if (message.trim() !== "" || fileUrl) {
         let url;
         if (!groupId) {
-          url = `http://13.51.198.21:4000/ChatApp/sendMessage`;
+          url = `http://16.171.121.124:4000/ChatApp/sendMessage`;
         } else {
-          url = `http://13.51.198.21:4000/ChatApp/sendGroupMessage`;
+          url = `http://16.171.121.124:4000/ChatApp/sendGroupMessage`;
         }
     
         const messageObject = {
           userId,
           message,
-          groupId 
+          groupId,
+          fileUrl
         };
-    
+
+        // console.log(messageObject, 'joasoajsjsjsas')
+
+        // socket.emit('chatMessage', messageObject);
+
         axios
           .post(url, messageObject)
           .then(response => {
             messageInput.value = ""; 
-            const senderName1 = response.data.newMessage.senderName
+            console.log(response, 'in response ')
+            // const senderName1 = response.data.newMessage.senderName
           })
           .catch(error => {
             console.error("Error sending chat message:", error);
@@ -75,8 +155,9 @@ document.addEventListener("DOMContentLoaded", function() {
   
   
     function displayUsers() {
-      axios.get("http://13.51.198.21:4000/ChatApp/getUsers")
+      axios.get("http://16.171.121.124:4000/ChatApp/getUsers")
         .then(response => {
+          // console.log(response, ' in the display users')
           const userList = response.data;
           updateUsers(userList);
         })
@@ -85,17 +166,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
   
-    displayUsers() 
-  
+
    
-    function displayMessages() {
+    function displayMessages(message) {
+      // console.log(message, ' in display message')
       const storedMessages = localStorage.getItem('messageList');
       const lastMessageId = storedMessages ? JSON.parse(storedMessages)[0]?.id : [];
   
       const userInfo = getUserInfoFromToken();
       const userId = userInfo.userId;
 
-      axios.get('http://13.51.198.21:4000/ChatApp/getMessage', { 
+      axios.get('http://16.171.121.124:4000/ChatApp/getMessage', { 
         params: {
           userId: userId,
           lastMessageId: lastMessageId,
@@ -103,6 +184,7 @@ document.addEventListener("DOMContentLoaded", function() {
       })
         .then(response => {
           const newMessages = response.data;
+          // console.log(newMessages, 'khdlsaihdwhdwuadgh')
           let messageList = storedMessages ? [...JSON.parse(storedMessages)] : [];
     
           newMessages.forEach(message => {
@@ -111,7 +193,9 @@ document.addEventListener("DOMContentLoaded", function() {
               messageList.push(message);
             }
           });
-  
+
+          // console.log(messageList, ' [[[[[]]]]]]')
+
           if (messageList.length > 10) {
             messageList = messageList.slice(-10); 
           }
@@ -128,11 +212,22 @@ document.addEventListener("DOMContentLoaded", function() {
             const senderName = message.sender;
             usernameElement.innerText = senderName; 
             messageElement.appendChild(usernameElement);
-    
-            const contentElement = document.createElement("span");
-            contentElement.classList.add("content");
-            contentElement.innerText = message.message;
-            messageElement.appendChild(contentElement);
+
+            // console.log(message, ' {{{{{{{{{{')
+            if (message.fileUrl) {
+              // If fileUrl exists, create an anchor element to display the file content
+              const fileLink = document.createElement('a');
+              fileLink.href = message.fileUrl;
+              fileLink.target = '_blank';
+              fileLink.innerText = 'View File';
+              messageElement.appendChild(fileLink);
+            } else {
+              // If no fileUrl, display the message content as text
+              const contentElement = document.createElement('span');
+              contentElement.classList.add('content');
+              contentElement.innerText = message.message;
+              messageElement.appendChild(contentElement);
+            }
     
             chatWindow.appendChild(messageElement);
           });
@@ -163,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
       };
   
       axios
-        .post("http://13.51.198.21:4000/ChatApp/createGroup", data)
+        .post("http://16.171.121.124:4000/ChatApp/createGroup", data)
         .then(response => {
           const { success, groupId } = response.data;
           if (success) {
@@ -185,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
     function displayGroups() {
       axios
-        .get("http://13.51.198.21:4000/ChatApp/displayGroups")
+        .get("http://16.171.121.124:4000/ChatApp/displayGroups")
         .then(response => {
           const groupList = response.data;
           const groupListElement = document.getElementById("group-list-items");
@@ -220,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function() {
       getGroupMembers(groupId);
       
       axios
-        .get(`http://13.51.198.21:4000/ChatApp/getMessage/${groupId}`, {
+        .get(`http://16.171.121.124:4000/ChatApp/getMessage/${groupId}`, {
           params: {
               userId: userId,
               lastMessageId: lastMessageId,
@@ -258,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function searchUser(query, groupId) {
     axios
-      .get("http://13.51.198.21:4000/ChatApp/searchUser", {
+      .get("http://16.171.121.124:4000/ChatApp/searchUser", {
           params: {
             query: query,
             groupId: groupId
@@ -334,7 +429,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userId = user.id;
   
       axios
-        .post(`http://13.51.198.21:4000/ChatApp/addGroupMember/${groupId}/${userId}`, {
+        .post(`http://16.171.121.124:4000/ChatApp/addGroupMember/${groupId}/${userId}`, {
           currentUserId: currentUserId 
         })
         .then((response) => {
@@ -346,15 +441,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-
-    // const addUserBtn = document.getElementById("add-user-btn");
-    // addUserBtn.addEventListener("click", function (event) {
-    //   event.preventDefault();
-    //   const query = searchUserInput.value.trim();
-    //   if (query !== "") {
-    //     searchUser(query);
-    //   }
-    // });
 
   
      const chatForm = document.getElementById("chat-form");
@@ -369,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userInfo = getUserInfoFromToken();
       const currentUserId = userInfo.userId;
       axios
-        .put(`http://13.51.198.21:4000/ChatApp/makeAdmin/${groupId}/${memberId}`, {
+        .put(`http://16.171.121.124:4000/ChatApp/makeAdmin/${groupId}/${memberId}`, {
           currentUserId: currentUserId
         })
         .then(response => {
@@ -393,7 +479,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function getGroupMembers(groupId) {
 
-      axios.get(`http://13.51.198.21:4000/ChatApp/groupMembers/${groupId}`)
+      axios.get(`http://16.171.121.124:4000/ChatApp/groupMembers/${groupId}`)
         .then(response => {
           const groupMembers = response.data;
           const memberList = document.getElementById("member-list");
@@ -418,7 +504,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     function removeMember(memberId) {
-      axios.delete(`http://13.51.198.21:4000/ChatApp/removeMember/${memberId}`)
+      axios.delete(`http://16.171.121.124:4000/ChatApp/removeMember/${memberId}`)
         .then(response => {
           // console.log(response, ' response of remove member')
           getGroupMembers(groupId);
@@ -444,7 +530,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userInfo = getUserInfoFromToken();
       const userId = userInfo.userId;
       
-      axios.get('http://13.51.198.21:4000/ChatApp/getMessage', { 
+      axios.get('http://16.171.121.124:4000/ChatApp/getMessage', { 
         params: {
           userId: userId,
           lastMessageId: lastMessageId,
@@ -494,7 +580,7 @@ document.addEventListener("DOMContentLoaded", function() {
     displayUsers();
     displayMessages();
     displayGroups();
-    // startMessageUpdate()
+    startMessageUpdate()
   
     
   

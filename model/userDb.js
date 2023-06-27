@@ -28,7 +28,7 @@ const User = sequelize.define('user', {
   },
   isLoggedIn: {
     type: Sequelize.BOOLEAN,
-    defaultValue: false
+    defaultValue: true
   }
 });
 

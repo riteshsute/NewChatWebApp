@@ -2,42 +2,69 @@ const { Op } = require('sequelize');
 const Message = require('../model/messageDb');
 const User = require('../model/userDb');
 const Group = require('../model/group');
+const { uploadFileToS3 } = require('../services/S3Services');
 
 
-exports.getUsers = (req, res) => {
-  User.findAll({
-    attributes: ['id', 'name', 'isLoggedIn'] 
-  })
-    .then(users => {
-      res.json(users);
-    })
-    .catch(error => {
+
+const getUsers = async (req, res) => {
+  // console.log(req, ' kndddjaidj')
+  try {
+      const users = await User.findAll({
+        where: {
+          isLoggedIn: true
+        }
+      })
+      // console.log(users, ' in getusers fun backend')
+      res.status(200).json(users) 
+  }
+  catch(error) {
       console.error("error getting users:", error);
-      res.status(500).json({ error: 'server error in getUsers' });
-    });
-}; 
+      res.status(500).json({ success: false, error: 'getUser error' });
+    }
+  } 
+  
 
-exports.sendMessage = async (req, res) => {
-    try {
-    const { userId, message } = req.body;
+const sendMessage = async (req, res ) => {
+  try {
+    const { userId, message, fileUrl } = req.body;
 
-    const sender = await User.findByPk(userId)
+    console.log( req.body, 'in the body ')
+
+    const sender = await User.findByPk(userId);
 
     if (sender) {
-      const newMessage = {
-        message, 
-      };
+      if (fileUrl) {
+        const fileData = Buffer.from(fileUrl, 'base64');
+        const fileName = `message_${Date.now()}`;
+      
+        const s3fileUrl = await uploadFileToS3(fileData, fileName);
+        console.log('File uploaded to S3:', s3fileUrl);
+      
+        const newMessage = {
+          userId,
+          fileUrl: s3fileUrl,
+          message: null,
+        };
 
-      await Message.create({ userId, message });
-      res.status(200).json({ success: true, message: ' message stored in database' });
-       } 
-    }catch (error) {
-      console.error('erro storing message:', error);
-      res.status(500).json({ success: false, error: 'backend server error' });
+        console.log(newMessage, 'jokokokkok')
+      
+        await Message.create(newMessage);
+      } else {
+        await Message.create({ userId, message, fileUrl: null });
+      }
+
+      res.status(200).json({ success: true, message: 'Message stored in the database' });
+    } else {
+      res.status(400).json({ success: false, error: 'User not found' });
     }
-  };
+  } catch (error) {
+    console.log('Error storing message:', error);
+    res.status(500).json({ success: false, error: 'Backend server error' });
+  }
+};
+
    
-  exports.sendGroupMessage = async (req, res) => {
+  const sendGroupMessage = async (req, res) => {
     try {
       const { userId, groupId, message } = req.body;
 
@@ -62,7 +89,7 @@ exports.sendMessage = async (req, res) => {
 
 
 
-  exports.getMessage = async (req, res) => {
+  const getMessage = async (req, res) => {
     try {
       let groupId  =req.params.groupId
       const lastMessageId = req.query.lastMessageId || 0;
@@ -91,7 +118,7 @@ exports.sendMessage = async (req, res) => {
         }
 
       const messages = await Message.findAll({
-        attributes: ['id', 'message', 'userId', 'groupId'],
+        attributes: ['id', 'message', 'userId', 'groupId', 'fileUrl'],
         where: {
           groupId: groupId,
           id: { [Op.gt]: lastMessageId },
@@ -106,8 +133,11 @@ exports.sendMessage = async (req, res) => {
         message: message.message, 
         userId: message.userId,
         sender: message.user.name,
-      }));
-  
+        fileUrl: message.fileUrl
+      })
+    );
+
+      // console.log(formattedMessages, 'josbjsbsvqsvqvwq  gws')
       res.json(formattedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -116,24 +146,13 @@ exports.sendMessage = async (req, res) => {
   };
   
   
+  module.exports = {
+   getUsers,
+   sendMessage,
+   sendGroupMessage,
+   getMessage,
+  }
   
-  
-  
-  
-
-exports.userDisconnect = (userId) => {
-  User.findByPk(userId)
-    .then(user => {
-      if (user) {
-        user.isLoggedIn = false;
-        return user.save();
-      }
-    })
-    .catch(error => {
-      console.error('Error updating user status:', error);
-    });
-};
-
 
 
 

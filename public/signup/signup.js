@@ -12,7 +12,7 @@ function signUpUser(event) {
         phonenumber
     };
 
-    axios.post("http://13.51.198.21:4000/ChatApp/signup", obj)
+    axios.post("http://16.171.121.124:4000/ChatApp/signup", obj)
     .then((response) => {
         if (response.data.message === "User already exists") {
             alert("User already exists");

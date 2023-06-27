@@ -13,9 +13,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { initSocket } = require('./socket');
 
+
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -61,12 +62,12 @@ Chats.belongsTo(Group, { foreignKey: 'groupId' });
   
 sequelize
   // .sync({ force: true })
-  .sync()  
+  .sync()   
   .then(() => {
     const socketServer = initSocket(server); 
 
-    server.listen(4000, () => {
-      console.log('Server is running on port 4000');
+    server.listen(5000, () => {
+      console.log('Server is running on port 5000');
     });
   }) 
   .catch((err) => {

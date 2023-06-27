@@ -2,6 +2,8 @@ const User = require('../model/userDb');
 const jwt = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 
+
+
 const signUpUser = ( async (req, res) => {
     const { name, email, password, phonenumber} = req.body;
   
@@ -60,9 +62,43 @@ const signUpUser = ( async (req, res) => {
     }
   }) 
 
+
+  const userConnect = (async (userId) => {
+    try {
+    console.log(userId, 'connect controller');
+    const user = await User.findByPk(userId);
+        if (user) {
+          user.isLoggedIn = true;
+          console.log(userId, 'connect controller checked');
+          return user.save();
+        }
+      } catch (error) {
+        console.log(error, 'in error catch connect user')
+        res.status(500).json({success: false, message: error} )
+      }
+   });
+
   
+   const userDisconnect = (async (userId) => {
+    try {
+    console.log(userId, 'disconnect controller');
+    const user = await User.findByPk(userId);
+        if (user) {
+          user.isLoggedIn = false;
+          console.log(userId, 'disconnect controller checked');
+          return user.save();
+        }
+      } catch (error) {
+        console.log(error, 'in error catch connect user')
+        res.status(500).json({success: false, message: error} )
+      }
+   });
+
+
 
   module.exports = {
     signUpUser,
-    loginUser
+    loginUser,
+    userConnect,
+    userDisconnect
   }
