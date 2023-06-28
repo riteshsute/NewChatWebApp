@@ -10,7 +10,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+const cors = require('cors'); 
 const { initSocket } = require('./socket');
 
 
@@ -66,7 +66,7 @@ sequelize
   .then(() => {
     const socketServer = initSocket(server); 
 
-    server.listen(5000, () => {
+    server.listen(4000, () => {
       console.log('Server is running on port 5000');
     });
   }) 
