@@ -167,6 +167,11 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
 
+  const generalMsgButton = document.getElementById("general-msg-button");
+    generalMsgButton.addEventListener("click", () => {
+      displayMessages();
+    });
+
  
   function displayMessages() {
     // console.log(message, ' in display message')
@@ -237,9 +242,19 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }
 
+  displayMessages();
+
+
+  
+  const createGroupBtn = document.getElementById("create-group-btn");
+  createGroupBtn.addEventListener("click", function(event) {
+    event.preventDefault();
+    createGroup();
+  });
 
 
   function createGroup() {
+    console.log('in the create group ')
     const groupNameInput = document.getElementById("group-name");
     const invitedUsersInput = document.getElementById("invited-users");
 
@@ -341,12 +356,24 @@ document.addEventListener("DOMContentLoaded", function() {
   
           chatWindow.appendChild(messageElement);
         });
+
+        localStorage.setItem('currentGroup', groupId);
+
       })
       .catch(error => {
         console.error("Error fetching group messages", error);
       });
   }
 
+
+  const currentGroup = localStorage.getItem('currentGroup');
+    console.log(currentGroup, 'jdcbdcddgcdksgcbdkc')
+    if (!currentGroup || currentGroup == 'undefined') {
+      displayMessages(); 
+    }
+    else {
+      switchGroup(currentGroup); 
+    }
 
   // groupId = " ";
 
@@ -516,11 +543,18 @@ function addUserToGroup(user, groupId, adminId) {
   
 
   // function startMessageUpdate() {
-  //   setInterval(() => {
-  //     updateChatWindow();
-  //   }, 1000);
+  //   if (currentGroup) {
+  //     console.log(currentGroup, 'in the start message group')
+  //     setInterval(() => {
+  //       switchGroup(groupId); // Fetch group messages at regular intervals
+  //     }, 1000);
+  //   } else {
+  //     setInterval(() => {
+  //       displayMessages(); // Fetch individual messages at regular intervals
+  //     }, 1000);
+  //   }
   // }
-
+ 
 
   
   function updateChatWindow() {
@@ -578,18 +612,10 @@ function addUserToGroup(user, groupId, adminId) {
 
     
   displayUsers();
-  displayMessages();
   displayGroups();
-  startMessageUpdate()
+  // startMessageUpdate()
 
   
-
-  const createGroupBtn = document.getElementById("create-group-btn");
-  createGroupBtn.addEventListener("click", function(event) {
-    event.preventDefault();
-    createGroup();
-  });
-
 
 
 });
