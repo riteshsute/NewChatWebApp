@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Create Group</title>
+      <link rel="stylesheet" href="./CSS/group.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+   </head>
+   <body>
+      <div class="center">
+         <div class="container">
+            <label for="show" class="close-btn fas fa-times" title="close" id="close"></label>
+            <div class="text">
+               Create User Group
+            </div>
+            <form action="#">
+               <div class="data">
+                  <label>User Group Name:-</label>
+                  <input type="text" id="groupName" placeholder="Enter User Group Name">
+               </div>
+               
+               <div class="btn">
+                  <div class="inner"></div>
+                  <button type="submit" id="submitGroup">Create Group</button>
+               </div>
+               <div id="showResponse" style="text-align: center;"></div>
+            </form>
+         </div>
+      </div>
+   </body>
+   <script src="../js/create-Group.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.5/axios.min.js"></script>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html><html class=''>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" 
+integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" 
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+<link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+<link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+
+
+<link rel="stylesheet" href="../views/CSS/chatappcss.css" class="cp-pen-styles">
+</head>
+<body style="background-color: #92bae2;">
+<div id="frame">
+	<div id="sidepanel">
+		<div id="profile" style="background: radial-gradient(black, transparent);">
+			<div class="wrap">
+				<p id="userName">Groups and Contacts</p>
+        
+			</div>
+		</div>
+		<div id="contacts">
+      
+		</div>
+		<div id="bottom-bar">
+      <button id="addGroup"><i aria-hidden="true"></i> <span>Create New Group</span></button>
+      <button id="showMyGroups"><i aria-hidden="true"></i>Show My Groups<span></span></button>
+      <button id="showGroupMembers"><i aria-hidden="true"></i> <span>Show Group members</span></button>
+			<button id="addUsers"><i aria-hidden="true"></i> <span>Add Contacts</span></button>
+		</div>
+	</div>
+	<div class="content">
+		<div class="contact-profile">
+            <p id="boxName">Chat App</p>
+			<div class="social-media">
+				<i aria-hidden="true" id="exit-chat">Exit</i>
+			</div>
+		</div>
+		<div class="messages" id="messageBox">
+      <ul id="showPreviousMsg">
+        
+      </ul>
+			<ul id="userMessage">
+			</ul>
+      <ul id="newMessages">
+
+      </ul>
+		</div>
+		<div class="message-input">
+			<div class="wrap">
+			<input class="wrapInput" type="text" id="message-input" placeholder="Write your message..." />
+			<button class="submit" id="send-message">Send</button>
+      <input class="fileInput" id="send-media" style="background: #b2d4f5;" type="file"></input>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.5/axios.min.js"></script>
+<script  src="http://localhost:3000/socket.io/socket.io.js"></script>
+<script src="../js/chat-app.js"></script>
+</body></html>
