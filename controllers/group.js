@@ -91,7 +91,7 @@ const getGroupMembers = async(req, res) => {
     }
 }
 
-// Deleting the user group id from the user group table
+
 const deleteGroupMember = async(req, res) => {
     const t = await sequelize.transaction();
     try {
